@@ -1,0 +1,70 @@
+#include <SoftwareSerial.h>
+
+int bluetoothTx = 2; // Gönderici pini
+int bluetoothRx = 3; // Alıcı pini
+
+int led = 12; 
+int dataFromBt; //Bluetooth aracılığıyla telefondan gelen bilgi
+
+SoftwareSerial bluetooth(bluetoothTx, bluetoothRx); 
+ //Alıcı ve verici pinlerini kullanarak bluetooth nesnesi oluşturuldu
+void setup()
+{
+ Serial.begin(9600); // Begin the serial monitor at 9600bps
+ 
+ bluetooth.begin(115200); // The Bluetooth Mate defaults to 115200bps
+ bluetooth.print("$"); // Print three times individually
+ bluetooth.print("$");
+ bluetooth.print("$"); // Enter command mode
+ delay(100); // Short delay, wait for the Mate to send back CMD
+ bluetooth.println("U,9600,N"); // Temporarily Change the baudrate to 9600, no parity
+ // 115200 can be too fast at times for NewSoftSerial to relay the data reliably
+ bluetooth.begin(9600); // Start bluetooth serial at 9600
+
+ pinMode(led, OUTPUT);
+
+}
+ 
+void loop()
+{
+ 
+ if(bluetooth.available()) // Bluetooth aktifse çalış
+ {
+ 
+ dataFromBt = bluetooth.read(); // Bluetooth aracılığıyla telefondan gelen bilgi okundu
+ 
+ if(dataFromBt == '1'){  //Eğer gelen bilgi 1 ise yani ON tuşuna basıldı ise
+ Serial.println("led on");
+ digitalWrite(led, HIGH);
+ 
+ }
+ if(dataFromBt == '0'){ //Eğer gelen bilgi 0 ise yani OFF tuşuna basıldı ise
+ Serial.println("led off");
+ digitalWrite(led, LOW);
+
+ }
+ if(dataFromBt == 'b'){ //Eğer gelen bilgi b ise led yanıp-sönsün 
+ digitalWrite(led, HIGH);
+ delay(500);
+ digitalWrite(led, LOW);
+ delay(500);
+ digitalWrite(led, HIGH);
+ delay(500);
+ digitalWrite(led, LOW);
+ delay(500);
+ }
+
+ if(dataFromBt == 'k'){ //Eğer gelen bilgi b ise led yanıp-sönsün 
+ digitalWrite(led, HIGH);
+ delay(100);
+ digitalWrite(led, LOW);
+ delay(100);
+ digitalWrite(led, HIGH);
+ delay(100);
+ digitalWrite(led, LOW);
+ delay(100);
+ }
+ 
+ }
+ 
+ }
